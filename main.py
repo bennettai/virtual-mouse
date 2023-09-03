@@ -4,6 +4,7 @@ import mediapipe as mp
 import tensorflow as tf
 from keras.saving import load_model
 
+
 # initialize mediapipe
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -59,6 +60,8 @@ while True:
 
             if className == 'thumb down':
                 # Write pyautogui logic
+                py.hotkey('command', 'shift', '3')
+                py.sleep(0.2)
                 pass
 
 

@@ -8,6 +8,7 @@ opencv-python = "*"
 tensorflow = "*"
 mediapipe = "*"
 keras = "*"
+pyautogui = "*"
 
 [dev-packages]
 
