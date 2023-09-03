@@ -5,6 +5,9 @@ name = "pypi"
 
 [packages]
 opencv-python = "*"
+tensorflow = "*"
+mediapipe = "*"
+keras = "*"
 
 [dev-packages]
 
