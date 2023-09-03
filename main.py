@@ -1,9 +1,8 @@
 import cv2
 import numpy as np
 import mediapipe as mp
-import tensorflow as tf
 from keras.saving import load_model
-
+import pyautogui as py
 
 # initialize mediapipe
 mpHands = mp.solutions.hands
@@ -43,7 +42,6 @@ while True:
         landmarks = []
         for handslms in result.multi_hand_landmarks:
             for lm in handslms.landmark:
-                # print(id, lm)
                 lmx = int(lm.x * x)
                 lmy = int(lm.y * y)
 

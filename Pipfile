@@ -9,6 +9,7 @@ tensorflow = "*"
 mediapipe = "*"
 keras = "*"
 pyautogui = "*"
+pillow = "*"
 
 [dev-packages]
 
