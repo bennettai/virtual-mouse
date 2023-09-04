@@ -3,12 +3,17 @@ import numpy as np
 import mediapipe as mp
 from keras.saving import load_model
 import pyautogui as py
+import time
 
 # initialize mediapipe
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
 mpDraw = mp.solutions.drawing_utils
 
+
+
+screen_width, screen_height = py.size()
+index_y = 0
 # Load the gesture recognizer model
 model = load_model('mp_hand_gesture')
 
@@ -26,7 +31,7 @@ while True:
     # Read each frame from the webcam
     _, frame = cap.read()
 
-    x, y, c = frame.shape
+    frame_height, frame_width, _ = frame.shape
 
     # Flip the frame vertically
     frame = cv2.flip(frame, 1)
@@ -35,17 +40,20 @@ while True:
     # Get hand landmark prediction
     result = hands.process(framergb)
     
+    classID = None
     className = ''
 
     # post process the result
     if result.multi_hand_landmarks:
         landmarks = []
+        originals = []
         for handslms in result.multi_hand_landmarks:
             for lm in handslms.landmark:
-                lmx = int(lm.x * x)
-                lmy = int(lm.y * y)
+                lmx = int(lm.x*frame_width)
+                lmy = int(lm.y*frame_height)
 
                 landmarks.append([lmx, lmy])
+                originals.append([lm.x, lm.y])
 
             # Drawing landmarks on frames
             mpDraw.draw_landmarks(frame, handslms, mpHands.HAND_CONNECTIONS)
@@ -55,13 +63,31 @@ while True:
       
             classID = np.argmax(prediction)
             className = classNames[classID]
+            
+    # TODO: Take Picture when smiling
+    if className == 'smile':
+        py.hotkey('command', 'shift', '3')
+        time.sleep(4)
 
-            if className == 'thumb down':
-                # Write pyautogui logic
-                py.hotkey('command', 'shift', '3')
-                py.sleep(0.2)
-                pass
+    if className == 'stop':
+        # ClassId: 2
+        x = int(landmarks[2][0]) - 50
+        y = int(landmarks[2][1])
+        cv2.putText(frame, f'({x},  {y})', (90, 90), cv2.FONT_HERSHEY_SIMPLEX, 
+                    1, (0,0,255), 2, cv2.LINE_AA)
 
+        cv2.circle(img=frame, center=(x,y), radius=10, color=(0, 255, 255))
+        index_x = screen_width/frame_width*x
+        index_y = screen_height/frame_height*y
+
+        cv2.circle(img=frame, center=(x,y), radius=10, color=(0, 255, 255))
+        thumb_x = screen_width/frame_width*x
+        thumb_y = screen_height/frame_height*y
+        print('outside', abs(index_y - thumb_y))
+        py.moveTo(index_x, index_y)
+        
+    if className == 'thumbs up':
+        py.click()
 
     # show the prediction on the frame
     cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 
